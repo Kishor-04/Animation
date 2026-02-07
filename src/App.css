@@ -25,7 +25,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(1.2) contrast(1.1) saturate(1.3);
+  filter: brightness(1.3) contrast(1.15) saturate(1.4);
 }
 
 .video-overlay {
@@ -35,6 +35,12 @@
   right: 0;
   bottom: 0;
   pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 182, 193, 0.05) 0%,
+    rgba(255, 105, 180, 0.08) 50%,
+    rgba(138, 43, 226, 0.1) 100%
+  );
 }
 
 /* Floating Petals */
@@ -149,6 +155,106 @@
   padding: 2rem;
   padding-top: 25rem;
   color: white;
+}
+/* Corner Roses */
+.corner-rose {
+  position: fixed;
+  font-size: 4rem;
+  z-index: 5;
+  animation: pulseGlow 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.8));
+}
+
+.top-left {
+  top: 20px;
+  left: 20px;
+  animation: pulseGlow 2s ease-in-out infinite, rotateClockwise 8s linear infinite;
+}
+
+.top-right {
+  top: 20px;
+  right: 20px;
+  animation: pulseGlow 2s ease-in-out infinite 0.5s, rotateCounterClockwise 8s linear infinite;
+}
+
+.bottom-left {
+  bottom: 20px;
+  left: 20px;
+  animation: pulseGlow 2s ease-in-out infinite 1s, rotateCounterClockwise 8s linear infinite;
+}
+
+.bottom-right {
+  bottom: 20px;
+  right: 20px;
+  animation: pulseGlow 2s ease-in-out infinite 1.5s, rotateClockwise 8s linear infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.8));
+  }
+  50% {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 30px rgba(255, 20, 147, 1));
+  }
+}
+
+@keyframes rotateClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotateCounterClockwise {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* Rose Day Text Animation */
+.rose-day-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: scaleOut 1s ease-out forwards;
+  margin-bottom: 2rem;
+}
+
+@keyframes scaleOut {
+  0% {
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1) rotate(2deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.rose-day-text {
+  font-size: 5rem;
+  font-weight: bold;
+  background: linear-gradient(45deg, #ffb6c1, #ff69b4, #ff1493, #ff69b4, #ffc0cb, #fff0f5);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientFlow 4s ease infinite;
+  text-align: center;
+  filter: drop-shadow(0 0 30px rgba(255, 182, 193, 0.6));
+}
+
+@keyframes gradientFlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Title Container */
@@ -296,6 +402,42 @@
     justify-content: flex-start;
   }
   
+  .rose-day-text {
+    font-size: 2.5rem;
+  }
+  
+  .corner-rose {
+    font-size: 2.5rem;
+  }
+  
+  .top-left, .top-right {
+    top: 10px;
+  }
+  
+  .top-left, .bottom-left {
+    left: 10px;
+  }
+  
+  .top-right, .bottom-right {
+    right: 10px;
+  }
+  
+  .bottom-left, .bottom-right {
+    bottom: 10px;
+  }
+  
+  .petal {
+    font-size: 1.5rem;
+  }
+  
+  .heart {
+    font-size: 1.2rem;
+  }
+  
+  .sparkle {
+    font-size: 0.8rem;
+  }
+  
   .main-title {
     font-size: 2.5rem;
     gap: 0.5rem;
@@ -321,18 +463,6 @@
   .quote {
     font-size: 1.3rem;
   }
-  
-  .petal {
-    font-size: 1.5rem;
-  }
-  
-  .heart {
-    font-size: 1.2rem;
-  }
-  
-  .sparkle {
-    font-size: 0.8rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -345,6 +475,38 @@
     padding: 0.75rem;
     padding-top: 5rem;
     justify-content: flex-start;
+  }
+  
+  .rose-day-text {
+    font-size: 2rem;
+  }
+  
+  .corner-rose {
+    font-size: 2rem;
+  }
+  
+  .top-left, .top-right {
+    top: 8px;
+  }
+  
+  .top-left, .bottom-left {
+    left: 8px;
+  }
+  
+  .top-right, .bottom-right {
+    right: 8px;
+  }
+  
+  .bottom-left, .bottom-right {
+    bottom: 8px;
+  }
+  
+  .petal {
+    font-size: 1.2rem;
+  }
+  
+  .heart {
+    font-size: 1rem;
   }
   
   .main-title {
@@ -371,14 +533,6 @@
   }
   
   .quote {
-    font-size: 1rem;
-  }
-  
-  .petal {
-    font-size: 1.2rem;
-  }
-  
-  .heart {
     font-size: 1rem;
   }
 }
