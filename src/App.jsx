@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import TeddyJigsaw from './TeddyJigsaw'
 
-function App() {
+function RoseDayHome({ onNavigate }) {
   const [petals, setPetals] = useState([])
   const [hearts, setHearts] = useState([])
   const [sparkles, setSparkles] = useState([])
@@ -105,15 +106,60 @@ function App() {
       <div className="content">
         <div className="title-container">
           <h1 className="main-title">
-         
+            Valentine's Week
           </h1>
+          <p className="subtitle">Celebrate Every Day with Love</p>
         </div>
 
-        
+        {/* Navigation Menu */}
+        <div className="navigation-menu">
+          <button 
+            className="nav-button teddy-btn"
+            onClick={() => onNavigate('teddy-jigsaw')}
+          >
+            🧸 Play Teddy Day Puzzle
+          </button>
+        </div>
 
       </div>
     </div>
   )
 }
 
-export default App
+function App() {
+  const [currentPage, setCurrentPage] = useState('home')
+
+  if (currentPage === 'teddy-jigsaw') {
+    return (
+      <div style={{ position: 'relative' }}>
+        <button 
+          className="back-button"
+          onClick={() => setCurrentPage('home')}
+          style={{
+            position: 'fixed',
+            top: '20px',
+            left: '20px',
+            zIndex: 10000,
+            padding: '12px 24px',
+            fontSize: '1.1rem',
+            background: 'linear-gradient(135deg, #ff69b4, #d84a6f)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '50px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(216, 74, 111, 0.4)',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+          onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+        >
+          ← Back to Home
+        </button>
+        <TeddyJigsaw />
+      </div>
+    )
+  }
+
+  return <RoseDayHome onNavigate={setCurrentPage} />
+}

@@ -6,9 +6,10 @@
 
 .valentine-container {
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 25%, #ffb6d9 50%, #ffc0cb 75%, #ffb6c1 100%);
   background-size: 400% 400%;
   animation: gradientShift 8s ease infinite;

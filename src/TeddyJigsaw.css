@@ -1,0 +1,566 @@
+.teddy-jigsaw-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fff5f7 0%, #ffe4e9 50%, #ffc0cb 100%);
+  position: relative;
+  padding: 2rem;
+}
+
+.floating-heart {
+  position: absolute;
+  pointer-events: none;
+  animation: floatHeart 6s infinite ease-in-out;
+  opacity: 0.4;
+  font-size: 1.5rem;
+  z-index: 1;
+}
+
+@keyframes floatHeart {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-30px) rotate(10deg);
+  }
+}
+
+.puzzle-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.puzzle-title {
+  font-size: 2.5rem;
+  font-family: Georgia, serif;
+  background: linear-gradient(135deg, #ff1493 0%, #ff69b4 50%, #ffb6c1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.progress-bar-container {
+  max-width: 400px;
+  margin: 0 auto 1rem;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid #ffb6c1;
+  box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ff69b4 0%, #ff1493 100%);
+  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress-text {
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.puzzle-hint {
+  font-size: 1.1rem;
+  color: #c04060;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+
+.check-puzzle-button {
+  margin-top: 1.5rem;
+  padding: 1rem 2.5rem;
+  font-size: 1.3rem;
+  font-family: Georgia, serif;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  border: 3px solid white;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
+  transition: all 0.3s ease;
+  animation: buttonPulse 2s infinite;
+}
+
+.check-puzzle-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(255, 20, 147, 0.6);
+}
+
+.check-puzzle-button:active {
+  transform: translateY(-1px);
+}
+
+@keyframes buttonPulse {
+  0%, 100% {
+    box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
+  }
+  50% {
+    box-shadow: 0 10px 35px rgba(255, 20, 147, 0.7);
+  }
+}
+
+.check-feedback {
+  margin-top: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.check-feedback.fail {
+  border: 3px solid #ff4444;
+}
+
+.feedback-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.feedback-text {
+  text-align: left;
+}
+
+.feedback-text strong {
+  display: block;
+  font-size: 1.3rem;
+  color: #ff1493;
+  margin-bottom: 0.5rem;
+  font-family: Georgia, serif;
+}
+
+.feedback-text p {
+  margin: 0.25rem 0;
+  color: #c04060;
+  font-family: Georgia, serif;
+}
+
+.accuracy-display {
+  font-weight: bold;
+  color: #ff1493;
+  font-size: 1.1rem;
+  margin-top: 0.5rem !important;
+}
+
+.puzzle-play-area {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 200px);
+  min-height: 600px;
+}
+
+.solution-grid-outline {
+  position: absolute;
+  border: 3px dashed #ff69b4;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 0 30px rgba(255, 105, 180, 0.2);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.puzzle-piece {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  transition: filter 0.3s ease;
+  z-index: 10;
+}
+
+.puzzle-piece:hover {
+  filter: drop-shadow(0 6px 12px rgba(255, 105, 180, 0.4));
+}
+
+.puzzle-piece.snapped {
+  animation: snapPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), shineEffect 0.8s ease-out;
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9));
+  z-index: 20;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+@keyframes shineEffect {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1)) brightness(1.3);
+  }
+}
+
+.puzzle-piece.snapped svg path {
+  stroke: #ff1493;
+  stroke-width: 3;
+  opacity: 0.8;
+}
+
+.puzzle-piece.just-snapped {
+  animation: connectionFlash 0.6s ease-out;
+}
+
+@keyframes connectionFlash {
+  0% {
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1));
+  }
+  50% {
+    filter: drop-shadow(0 0 35px rgba(255, 105, 180, 1));
+  }
+  100% {
+    filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.6));
+  }
+}
+
+.connection-sparkle {
+  position: absolute;
+  font-size: 1.5rem;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Grid Boxes */
+.grid-box {
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes snapPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Full Image Reveal */
+.full-image-reveal {
+  position: absolute;
+  left: 650px;
+  top: 100px;
+  width: 360px;
+  height: 480px;
+  z-index: 2000;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 
+    0 0 60px rgba(255, 215, 0, 0.9),
+    0 0 120px rgba(255, 105, 180, 0.6),
+    0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: revealGlow 2s ease-in-out infinite;
+}
+
+@keyframes revealGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 60px rgba(255, 215, 0, 0.9),
+      0 0 120px rgba(255, 105, 180, 0.6),
+      0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 80px rgba(255, 215, 0, 1),
+      0 0 150px rgba(255, 105, 180, 0.8),
+      0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.revealed-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.glow-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 215, 0, 0.2) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.completion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 182, 193, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.completion-message {
+  background: white;
+  padding: 3rem 4rem;
+  border-radius: 30px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(255, 105, 180, 0.5);
+  border: 4px solid #ff69b4;
+}
+
+.completion-message h2 {
+  font-size: 2.5rem;
+  color: #ff1493;
+  font-family: Georgia, serif;
+  margin-bottom: 1rem;
+}
+
+.completion-message p {
+  font-size: 1.3rem;
+  color: #c04060;
+  font-family: Georgia, serif;
+}
+
+.pieces-count {
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+  color: #ff1493;
+}
+
+.countdown-circle {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.countdown-number {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  font-weight: bold;
+  color: white;
+  box-shadow: 
+    0 0 0 8px rgba(255, 105, 180, 0.3),
+    0 10px 30px rgba(255, 20, 147, 0.5);
+  animation: countdownPulse 1s infinite;
+}
+
+@keyframes countdownPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 0 0 8px rgba(255, 105, 180, 0.3),
+      0 10px 30px rgba(255, 20, 147, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 
+      0 0 0 12px rgba(255, 105, 180, 0.5),
+      0 15px 40px rgba(255, 20, 147, 0.7);
+  }
+}
+
+.countdown-text {
+  font-size: 1.2rem;
+  color: #ff1493;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .puzzle-play-area {
+    transform: scale(0.8);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 768px) {
+  .teddy-jigsaw-container {
+    padding: 1rem;
+  }
+
+  .puzzle-title {
+    font-size: 2rem;
+  }
+
+  .progress-bar-container {
+    max-width: 300px;
+    height: 35px;
+  }
+
+  .progress-text {
+    font-size: 0.9rem;
+  }
+
+  .puzzle-hint {
+    font-size: 0.9rem;
+  }
+
+  .check-puzzle-button {
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+
+  .check-feedback {
+    margin-top: 1rem;
+    padding: 1rem 1.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .feedback-icon {
+    font-size: 2.5rem;
+  }
+
+  .feedback-text strong {
+    font-size: 1.1rem;
+  }
+
+  .feedback-text p {
+    font-size: 0.9rem;
+  }
+
+  .puzzle-play-area {
+    transform: scale(0.6);
+    transform-origin: top center;
+    height: calc(100vh - 180px);
+  }
+
+  .completion-message {
+    padding: 2rem 2.5rem;
+  }
+
+  .completion-message h2 {
+    font-size: 2rem;
+  }
+
+  .countdown-number {
+    width: 100px;
+    height: 100px;
+    font-size: 3rem;
+  }
+
+  .countdown-text {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .puzzle-title {
+    font-size: 1.5rem;
+  }
+
+  .progress-bar-container {
+    max-width: 250px;
+    height: 30px;
+  }
+
+  .puzzle-play-area {
+    transform: scale(0.45);
+  }
+
+  .completion-message {
+    padding: 1.5rem 2rem;
+  }
+
+  .completion-message h2 {
+    font-size: 1.5rem;
+  }
+
+  .completion-message p {
+    font-size: 1rem;
+  }
+
+  .countdown-number {
+    width: 80px;
+    height: 80px;
+    font-size: 2.5rem;
+  }
+
+  .countdown-text {
+    font-size: 0.9rem;
+  }
+
+  .check-puzzle-button {
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .check-feedback {
+    padding: 1rem;
+  }
+
+  .feedback-icon {
+    font-size: 2rem;
+  }
+
+  .feedback-text strong {
+    font-size: 1rem;
+  }
+
+  .feedback-text p {
+    font-size: 0.85rem;
+  }
+}
