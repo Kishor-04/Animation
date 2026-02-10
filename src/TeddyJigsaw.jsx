@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import './TeddyJigsaw.css';
 
@@ -18,15 +17,11 @@ const SNAP_THRESHOLD = 15;
 const SOLUTION_START_X = 650;
 const SOLUTION_START_Y = 100;
 
-const TeddyJigsaw = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
-  
+const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onComplete }) => {
   const [pieces, setPieces] = useState([]);
   const [snappedPieces, setSnappedPieces] = useState(new Set());
-  const [imageSrc, setImageSrc] = useState(null);
-  const [imageName, setImageName] = useState('');
+  const [imageSrc, setImageSrc] = useState(propImageSrc || null);
+  const [imageName, setImageName] = useState(propImageName || '');
   const [isComplete, setIsComplete] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [justSnapped, setJustSnapped] = useState(null);
@@ -47,17 +42,10 @@ const TeddyJigsaw = () => {
   };
 
   useEffect(() => {
-    // Get image from URL params or location state
-    const imageParam = searchParams.get('image');
-    const stateImageSrc = location.state?.imageSrc;
-    const stateImageName = location.state?.imageName;
-
-    if (imageParam && imageMap[imageParam]) {
-      setImageSrc(imageMap[imageParam]);
-      setImageName(imageParam);
-    } else if (stateImageSrc) {
-      setImageSrc(stateImageSrc);
-      setImageName(stateImageName);
+    // Initialize image from props
+    if (propImageSrc && propImageName) {
+      setImageSrc(propImageSrc);
+      setImageName(propImageName);
     } else {
       // Fallback to first teddy if no image specified
       setImageSrc(teddy1);
@@ -67,7 +55,7 @@ const TeddyJigsaw = () => {
     // Initialize sound effects
     snapSoundRef.current = new Audio('/assets/snap.mp3');
     completeSoundRef.current = new Audio('/assets/complete.mp3');
-  }, [searchParams, location.state]);
+  }, [propImageSrc, propImageName]);
 
   useEffect(() => {
     if (imageSrc) {
@@ -81,14 +69,14 @@ const TeddyJigsaw = () => {
       setCheckResult('success');
       setShowFullImage(true);
       completeSoundRef.current?.play().catch(e => console.log('Audio play failed:', e));
-      // Navigate after 3 seconds total
+      // Transition to complete screen after 3 seconds total
       setTimeout(() => {
-        navigate('/teddy-complete', { 
-          state: { imageSrc, imageName } 
-        });
+        if (onComplete) {
+          onComplete(imageSrc, imageName);
+        }
       }, 3000);
     }
-  }, [snappedPieces, isComplete, navigate, imageSrc, imageName]);
+  }, [snappedPieces, isComplete, imageSrc, imageName, onComplete]);
 
   useEffect(() => {
     // Show/hide check button when at least 50% pieces are placed

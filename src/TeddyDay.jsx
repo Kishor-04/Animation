@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 import './TeddyDay.css';
 
 // Import teddy images
@@ -10,8 +9,7 @@ import teddy4 from './assets/teddy_4.svg';
 import teddy5 from './assets/teddy_5.jpg';
 import teddy6 from './assets/teddy_6.svg';
 
-const TeddyDay = () => {
-  const navigate = useNavigate();
+const TeddyDay = ({ onImageSelect }) => {
   const [selectedIndex, setSelectedIndex] = useState(null);
 
   const teddyImages = [
@@ -26,11 +24,11 @@ const TeddyDay = () => {
   const handleImageClick = (index, imageSrc, imageName) => {
     setSelectedIndex(index);
     
-    // Small delay for visual feedback before navigation
+    // Small delay for visual feedback before transition
     setTimeout(() => {
-      navigate(`/teddy-jigsaw?image=${imageName}`, { 
-        state: { imageSrc, imageName } 
-      });
+      if (onImageSelect) {
+        onImageSelect(imageSrc, imageName);
+      }
     }, 600);
   };
 

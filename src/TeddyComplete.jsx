@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import './TeddyComplete.css';
 
@@ -11,13 +10,11 @@ import teddy4 from './assets/teddy_4.svg';
 import teddy5 from './assets/teddy_5.jpg';
 import teddy6 from './assets/teddy_6.svg';
 
-const TeddyComplete = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+const TeddyComplete = ({ imageSrc: propImageSrc, imageName: propImageName, onPlayAgain }) => {
   const [showContent, setShowContent] = useState(false);
   
-  const imageSrc = location.state?.imageSrc || teddy1;
-  const imageName = location.state?.imageName || 'teddy_1.jpg';
+  const imageSrc = propImageSrc || teddy1;
+  const imageName = propImageName || 'teddy_1.jpg';
 
   const imageMap = {
     'teddy_1.jpg': teddy1,
@@ -42,7 +39,9 @@ const TeddyComplete = () => {
   }, []);
 
   const handlePlayAgain = () => {
-    navigate('/teddy-day');
+    if (onPlayAgain) {
+      onPlayAgain();
+    }
   };
 
   // Generate heart confetti
