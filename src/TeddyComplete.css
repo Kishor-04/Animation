@@ -271,6 +271,9 @@
   box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
   transition: all 0.3s ease;
   border: 3px solid white;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 44px;
 }
 
 .play-again-button:hover {
@@ -286,90 +289,106 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .teddy-complete-container {
-    padding: 1rem;
+    padding: 1.5rem 1rem;
   }
 
   .completed-image-wrapper {
-    width: 300px;
-    height: 300px;
+    width: 320px;
+    height: 320px;
     margin-bottom: 1.5rem;
+    border-width: 5px;
   }
 
   .complete-title {
-    font-size: 3rem;
+    font-size: 3.5rem;
     margin-bottom: 1.5rem;
   }
 
   .complete-message {
     padding: 1.5rem 2rem;
     margin-bottom: 1.5rem;
+    border-width: 2px;
   }
 
   .message-text {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 
   .message-decoration {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
   }
 
   .badge-inner {
-    padding: 0.8rem 2rem;
+    padding: 0.9rem 2.2rem;
   }
 
   .badge-icon {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
   }
 
   .badge-text {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 
   .play-again-button {
-    padding: 0.8rem 2.5rem;
-    font-size: 1.1rem;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    min-height: 50px;
+  }
+
+  .heart-confetti {
+    font-size: 1.8rem;
   }
 }
 
 @media (max-width: 480px) {
+  .teddy-complete-container {
+    padding: 1rem;
+  }
+
   .completed-image-wrapper {
-    width: 250px;
-    height: 250px;
+    width: 260px;
+    height: 260px;
+    margin-bottom: 1.2rem;
+    border-width: 4px;
   }
 
   .complete-title {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
+    margin-bottom: 1.2rem;
   }
 
   .complete-message {
-    padding: 1rem 1.5rem;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.2rem;
   }
 
   .message-text {
-    font-size: 1rem;
+    font-size: 1.1rem;
     line-height: 1.6;
   }
 
   .message-decoration {
-    font-size: 1.2rem;
-    gap: 0.5rem;
+    font-size: 1.5rem;
+    gap: 0.6rem;
   }
 
   .badge-inner {
-    padding: 0.6rem 1.5rem;
+    padding: 0.7rem 1.8rem;
   }
 
   .badge-icon {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
   }
 
   .badge-text {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
   .play-again-button {
-    padding: 0.7rem 2rem;
-    font-size: 1rem;
+    padding: 0.9rem 2.5rem;
+    font-size: 1.1rem;
+    min-height: 48px;
   }
 
   .heart-confetti {
@@ -378,6 +397,27 @@
 
   .floating-bg-decoration {
     font-size: 3rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .completed-image-wrapper {
+    width: 220px;
+    height: 220px;
+  }
+
+  .complete-title {
+    font-size: 2.3rem;
+  }
+
+  .message-text {
+    font-size: 1rem;
+  }
+
+  .play-again-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
   }
 }
 

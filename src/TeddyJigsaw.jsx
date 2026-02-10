@@ -352,39 +352,42 @@ const TeddyJigsaw = () => {
 
       <div className="puzzle-play-area">
         {/* Grid boxes with ghost images */}
-        {pieces.map(piece => (
-          <div
-            key={`grid-${piece.id}`}
-            className="grid-box"
-            style={{
-              position: 'absolute',
-              left: piece.correctX,
-              top: piece.correctY,
-              width: PIECE_SIZE,
-              height: PIECE_SIZE,
-            }}
-          >
-            <svg
-              width={PIECE_SIZE}
-              height={PIECE_SIZE}
-              viewBox={`0 0 ${PIECE_SIZE} ${PIECE_SIZE}`}
-              style={{ overflow: 'visible' }}
+        <div className="grid-container">
+          {pieces.map(piece => (
+            <div
+              key={`grid-${piece.id}`}
+              className="grid-box"
+              style={{
+                position: 'absolute',
+                left: piece.correctX - SOLUTION_START_X,
+                top: piece.correctY - SOLUTION_START_Y,
+                width: PIECE_SIZE,
+                height: PIECE_SIZE,
+              }}
             >
-              <path
-                d={piece.path}
-                fill="none"
-                stroke="#ff69b4"
-                strokeWidth={snappedPieces.has(piece.id) ? "1" : "3"}
-                strokeDasharray="5,5"
-                opacity={snappedPieces.has(piece.id) ? "0.2" : "0.6"}
-              />
-            </svg>
-          </div>
-        ))}
+              <svg
+                width={PIECE_SIZE}
+                height={PIECE_SIZE}
+                viewBox={`0 0 ${PIECE_SIZE} ${PIECE_SIZE}`}
+                style={{ overflow: 'visible' }}
+              >
+                <path
+                  d={piece.path}
+                  fill="none"
+                  stroke="#ff69b4"
+                  strokeWidth={snappedPieces.has(piece.id) ? "1" : "3"}
+                  strokeDasharray="5,5"
+                  opacity={snappedPieces.has(piece.id) ? "0.2" : "0.6"}
+                />
+              </svg>
+            </div>
+          ))}
+        </div>
 
         {/* Puzzle pieces */}
-        <AnimatePresence>
-          {pieces.map(piece => (
+        <div className="pieces-container">
+          <AnimatePresence>
+            {pieces.map(piece => (
             <motion.div
               key={piece.id}
               drag={!snappedPieces.has(piece.id)}
@@ -471,6 +474,7 @@ const TeddyJigsaw = () => {
               )}            </motion.div>
           ))}
         </AnimatePresence>
+        </div>
 
         {/* Full Image Reveal on Completion */}
         <AnimatePresence>

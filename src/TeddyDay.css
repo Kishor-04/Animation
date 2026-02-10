@@ -86,6 +86,8 @@
   box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border: 3px solid #ffb6c1;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .teddy-card:hover {
@@ -176,21 +178,29 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .teddy-day-container {
+    padding: 1.5rem 1rem;
+  }
+
   .teddy-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
-  }
-
-  .teddy-day-title {
-    font-size: 2.5rem;
+    max-width: 500px;
   }
 
   .teddy-day-subtitle {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
   }
 
-  .teddy-day-hint {
-    font-size: 1rem;
+  .teddy-card {
+    border-radius: 15px;
+    border-width: 2px;
+  }
+
+  .teddy-number {
+    font-size: 1.1rem;
+    padding: 0.4rem 0.8rem;
   }
 }
 
@@ -199,25 +209,39 @@
     padding: 1rem;
   }
 
-  .teddy-grid {
-    gap: 1rem;
-  }
-
-  .teddy-day-title {
-    font-size: 2rem;
-  }
-
   .teddy-day-subtitle {
-    font-size: 1rem;
-    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .teddy-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    max-width: 100%;
   }
 
   .teddy-card {
-    border-radius: 15px;
+    border-radius: 12px;
+    min-height: 120px;
+  }
+
+  .teddy-card:hover {
+    transform: scale(1.05);
   }
 
   .teddy-number {
     font-size: 1rem;
     padding: 0.3rem 0.7rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .teddy-grid {
+    gap: 0.75rem;
+  }
+
+  .teddy-card {
+    min-height: 100px;
   }
 }
