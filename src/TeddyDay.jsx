@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './TeddyDay.css';
 
 // Import teddy images
@@ -11,6 +11,7 @@ import teddy6 from './assets/teddy_6.svg';
 
 const TeddyDay = ({ onImageSelect }) => {
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
 
   const teddyImages = [
     { id: 1, src: teddy1, name: 'teddy_1.jpg' },
@@ -21,9 +22,32 @@ const TeddyDay = ({ onImageSelect }) => {
     { id: 6, src: teddy6, name: 'teddy_6.svg' },
   ];
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const floatingDecorations = useMemo(
+    () =>
+      Array.from({ length: isMobile ? 10 : 20 }).map((_, i) => ({
+        key: `float-${i}`,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${3 + Math.random() * 4}s`,
+        fontSize: `${Math.random() > 0.5 ? '2rem' : '1.5rem'}`,
+        symbol: Math.random() > 0.5 ? '🧸' : '💕',
+      })),
+    [isMobile]
+  );
+
   const handleImageClick = (index, imageSrc, imageName) => {
     setSelectedIndex(index);
-    
+
     // Small delay for visual feedback before transition
     setTimeout(() => {
       if (onImageSelect) {
@@ -35,19 +59,19 @@ const TeddyDay = ({ onImageSelect }) => {
   return (
     <div className="teddy-day-container">
       {/* Floating decorative hearts and teddies */}
-      {Array.from({ length: 20 }).map((_, i) => (
+      {floatingDecorations.map(decoration => (
         <div
-          key={`float-${i}`}
+          key={decoration.key}
           className="floating-decoration"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 5}s`,
-            animationDuration: `${3 + Math.random() * 4}s`,
-            fontSize: `${Math.random() > 0.5 ? '2rem' : '1.5rem'}`,
+            left: decoration.left,
+            top: decoration.top,
+            animationDelay: decoration.animationDelay,
+            animationDuration: decoration.animationDuration,
+            fontSize: decoration.fontSize,
           }}
         >
-          {Math.random() > 0.5 ? '🧸' : '💕'}
+          {decoration.symbol}
         </div>
       ))}
 

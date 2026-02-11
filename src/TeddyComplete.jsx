@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './TeddyComplete.css';
 
@@ -12,7 +12,8 @@ import teddy6 from './assets/teddy_6.svg';
 
 const TeddyComplete = ({ imageSrc: propImageSrc, imageName: propImageName, onPlayAgain }) => {
   const [showContent, setShowContent] = useState(false);
-  
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+
   const imageSrc = propImageSrc || teddy1;
   const imageName = propImageName || 'teddy_1.jpg';
 
@@ -38,22 +39,58 @@ const TeddyComplete = ({ imageSrc: propImageSrc, imageName: propImageName, onPla
     }, 300);
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handlePlayAgain = () => {
     if (onPlayAgain) {
       onPlayAgain();
     }
   };
 
-  // Generate heart confetti
-  const heartConfetti = Array.from({ length: 50 }).map((_, i) => ({
-    id: i,
-    emoji: ['💕', '❤️', '💖', '💗', '💓', '💝'][Math.floor(Math.random() * 6)],
-    left: Math.random() * 100,
-    delay: Math.random() * 3,
-    duration: 3 + Math.random() * 4,
-    size: 1 + Math.random() * 2,
-    animationType: Math.random() > 0.5 ? 'fall-left' : 'fall-right',
-  }));
+  const heartConfetti = useMemo(
+    () =>
+      Array.from({ length: isMobile ? 24 : 50 }).map((_, i) => ({
+        id: i,
+        emoji: ['💕', '❤️', '💖', '💗', '💓', '💝'][Math.floor(Math.random() * 6)],
+        left: Math.random() * 100,
+        delay: Math.random() * 3,
+        duration: 3 + Math.random() * 4,
+        size: 1 + Math.random() * 2,
+        animationType: Math.random() > 0.5 ? 'fall-left' : 'fall-right',
+      })),
+    [isMobile]
+  );
+
+  const floatingDecorations = useMemo(
+    () =>
+      Array.from({ length: isMobile ? 10 : 20 }).map((_, i) => ({
+        key: `bg-${i}`,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${5 + Math.random() * 5}s`,
+        opacity: 0.1 + Math.random() * 0.2,
+      })),
+    [isMobile]
+  );
+
+  const sparkles = useMemo(
+    () =>
+      Array.from({ length: isMobile ? 14 : 30 }).map((_, i) => ({
+        key: `sparkle-${i}`,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 3}s`,
+      })),
+    [isMobile]
+  );
 
   return (
     <div className="teddy-complete-container">
@@ -74,16 +111,16 @@ const TeddyComplete = ({ imageSrc: propImageSrc, imageName: propImageName, onPla
       ))}
 
       {/* Floating background decorations */}
-      {Array.from({ length: 20 }).map((_, i) => (
+      {floatingDecorations.map(decoration => (
         <div
-          key={`bg-${i}`}
+          key={decoration.key}
           className="floating-bg-decoration"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 5}s`,
-            animationDuration: `${5 + Math.random() * 5}s`,
-            opacity: 0.1 + Math.random() * 0.2,
+            left: decoration.left,
+            top: decoration.top,
+            animationDelay: decoration.animationDelay,
+            animationDuration: decoration.animationDuration,
+            opacity: decoration.opacity,
           }}
         >
           🧸
@@ -103,11 +140,11 @@ const TeddyComplete = ({ imageSrc: propImageSrc, imageName: propImageName, onPla
               className="completed-image-wrapper"
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ 
+              transition={{
                 duration: 1,
                 type: 'spring',
                 stiffness: 200,
-                delay: 0.2 
+                delay: 0.2,
               }}
             >
               <img
@@ -149,11 +186,11 @@ const TeddyComplete = ({ imageSrc: propImageSrc, imageName: propImageName, onPla
               className="success-badge"
               initial={{ scale: 0 }}
               animate={{ scale: 1, rotate: 360 }}
-              transition={{ 
+              transition={{
                 delay: 1.1,
                 duration: 0.8,
                 type: 'spring',
-                stiffness: 200 
+                stiffness: 200,
               }}
             >
               <div className="badge-inner">
@@ -183,14 +220,14 @@ const TeddyComplete = ({ imageSrc: propImageSrc, imageName: propImageName, onPla
       </AnimatePresence>
 
       {/* Sparkle effects */}
-      {Array.from({ length: 30 }).map((_, i) => (
+      {sparkles.map(sparkle => (
         <div
-          key={`sparkle-${i}`}
+          key={sparkle.key}
           className="sparkle"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 3}s`,
+            left: sparkle.left,
+            top: sparkle.top,
+            animationDelay: sparkle.animationDelay,
           }}
         />
       ))}

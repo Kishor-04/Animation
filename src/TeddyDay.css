@@ -1,11 +1,12 @@
 .teddy-day-container {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 25%, #fff5f7 50%, #ffe4e9 75%, #ffb6c1 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: clamp(1rem, 4vw, 2rem);
   position: relative;
+  overflow: hidden;
 }
 
 .floating-decoration {
@@ -34,7 +35,7 @@
 .teddy-day-content {
   position: relative;
   z-index: 2;
-  max-width: 1200px;
+  max-width: min(1200px, 100%);
   width: 100%;
   text-align: center;
 }
@@ -61,19 +62,28 @@
 }
 
 .teddy-day-subtitle {
-  font-size: 1.5rem;
+  font-size: clamp(1.1rem, 2.8vw, 1.5rem);
   color: #c04060;
   font-family: Georgia, serif;
-  margin-bottom: 3rem;
+  margin-bottom: clamp(1.25rem, 3vw, 3rem);
   text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .teddy-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  max-width: 900px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: clamp(0.75rem, 2.5vw, 2rem);
+  max-width: min(900px, 100%);
   margin: 0 auto 2rem;
+}
+
+/* Desktop grid enhancement */
+@media (min-width: 1024px) {
+  .teddy-grid {
+    grid-template-columns: repeat(3, minmax(200px, 250px));
+    gap: 2.5rem;
+    max-width: 1000px;
+  }
 }
 
 .teddy-card {
@@ -160,10 +170,11 @@
 }
 
 .teddy-day-hint {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
   color: #ff69b4;
   font-family: Georgia, serif;
   font-style: italic;
+  line-height: 1.5;
   animation: hintGlow 2s ease-in-out infinite;
 }
 
@@ -177,15 +188,22 @@
 }
 
 /* Responsive Design */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .teddy-grid {
+    grid-template-columns: repeat(3, minmax(160px, 200px));
+    gap: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .teddy-day-container {
     padding: 1.5rem 1rem;
   }
 
   .teddy-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    max-width: 500px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    max-width: 540px;
   }
 
   .teddy-day-subtitle {
@@ -215,7 +233,7 @@
   }
 
   .teddy-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     max-width: 100%;
   }

@@ -1,13 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
 
 .teddy-complete-container {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: radial-gradient(ellipse at center, #ffb6c1 0%, #ff69b4 50%, #ff1493 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 2rem;
+  padding: clamp(1rem, 4vw, 2rem);
+  overflow: hidden;
 }
 
 /* Heart Confetti Animations */
@@ -102,14 +103,15 @@
   position: relative;
   z-index: 10;
   text-align: center;
-  max-width: 800px;
+  max-width: min(800px, 100%);
   width: 100%;
+  padding-bottom: 1rem;
 }
 
 .completed-image-wrapper {
   margin: 0 auto 2rem;
-  width: 400px;
-  height: 400px;
+  width: min(400px, 78vw);
+  aspect-ratio: 1;
   border-radius: 30px;
   overflow: hidden;
   box-shadow: 
@@ -118,6 +120,15 @@
   border: 6px solid white;
   background: white;
   animation: imageGlow 2s infinite ease-in-out;
+}
+
+/* Desktop image enhancement */
+@media (min-width: 1024px) {
+  .completed-image-wrapper {
+    width: min(480px, 70vw);
+    border-radius: 35px;
+    border-width: 8px;
+  }
 }
 
 @keyframes imageGlow {
@@ -143,7 +154,7 @@
 
 .complete-title {
   font-family: 'Satisfy', cursive;
-  font-size: 4rem;
+  font-size: clamp(2.2rem, 9vw, 4rem);
   color: white;
   margin-bottom: 2rem;
   text-shadow: 
@@ -163,7 +174,7 @@
 
 .complete-message {
   background: rgba(255, 255, 255, 0.95);
-  padding: 2rem 3rem;
+  padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 5vw, 3rem);
   border-radius: 25px;
   margin-bottom: 2rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -172,7 +183,7 @@
 
 .message-text {
   font-family: Georgia, serif;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 3.5vw, 1.5rem);
   color: #c04060;
   line-height: 1.8;
   font-style: italic;
@@ -262,8 +273,8 @@
   background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
   color: white;
   border: none;
-  padding: 1rem 3rem;
-  font-size: 1.3rem;
+  padding: 1rem 2.4rem;
+  font-size: clamp(1rem, 3.3vw, 1.3rem);
   font-family: Georgia, serif;
   font-weight: bold;
   border-radius: 50px;
@@ -290,11 +301,12 @@
 @media (max-width: 768px) {
   .teddy-complete-container {
     padding: 1.5rem 1rem;
+    align-items: flex-start;
+    overflow-y: auto;
   }
 
   .completed-image-wrapper {
-    width: 320px;
-    height: 320px;
+    width: min(320px, 84vw);
     margin-bottom: 1.5rem;
     border-width: 5px;
   }
@@ -341,14 +353,60 @@
   }
 }
 
+/* Desktop celebration enhancements */
+@media (min-width: 1024px) {
+  .complete-title {
+    font-size: 5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .complete-message {
+    padding: 2rem 3.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .message-text {
+    font-size: 1.6rem;
+  }
+
+  .message-decoration {
+    font-size: 2.5rem;
+  }
+
+  .badge-inner {
+    padding: 1.2rem 2.8rem;
+  }
+
+  .badge-icon {
+    font-size: 2.5rem;
+  }
+
+  .badge-text {
+    font-size: 1.6rem;
+  }
+
+  .play-again-button {
+    padding: 1.3rem 3.5rem;
+    font-size: 1.4rem;
+    min-height: 60px;
+  }
+
+  .heart-confetti {
+    font-size: 2.5rem;
+  }
+
+  .floating-bg-decoration {
+    font-size: 5rem;
+  }
+}
+
 @media (max-width: 480px) {
   .teddy-complete-container {
     padding: 1rem;
   }
 
   .completed-image-wrapper {
-    width: 260px;
-    height: 260px;
+    width: min(260px, 86vw);
     margin-bottom: 1.2rem;
     border-width: 4px;
   }
@@ -403,8 +461,7 @@
 /* Extra small devices */
 @media (max-width: 360px) {
   .completed-image-wrapper {
-    width: 220px;
-    height: 220px;
+    width: min(220px, 88vw);
   }
 
   .complete-title {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './TeddyJigsaw.css';
 
@@ -12,10 +12,42 @@ import teddy6 from './assets/teddy_6.svg';
 
 const ROWS = 4;
 const COLS = 3;
-const PIECE_SIZE = 120;
-const SNAP_THRESHOLD = 15;
-const SOLUTION_START_X = 650;
-const SOLUTION_START_Y = 100;
+
+const getPuzzleLayout = () => {
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const isMobile = viewportWidth <= 768;
+  
+  // Enhanced desktop sizing for better visibility
+  const pieceSize = viewportWidth <= 360 ? 72 : 
+                    viewportWidth <= 480 ? 82 : 
+                    viewportWidth <= 768 ? 92 : 
+                    viewportWidth <= 1024 ? 140 : 160;
+  
+  const gridWidth = pieceSize * COLS;
+  const gridHeight = pieceSize * ROWS;
+
+  const gridStartX = isMobile
+    ? Math.max(12, Math.floor((viewportWidth - gridWidth) / 2))
+    : Math.floor((viewportWidth - gridWidth) / 2);
+
+  const gridStartY = isMobile ? 24 : 120;
+  const playAreaMinHeight = isMobile
+    ? Math.max(gridStartY + gridHeight + pieceSize * 3 + 90, Math.round(viewportHeight * 0.92))
+    : Math.max(720, viewportHeight - 200);
+
+  return {
+    isMobile,
+    pieceSize,
+    gridWidth,
+    gridHeight,
+    gridStartX,
+    gridStartY,
+    playAreaMinHeight,
+    snapThreshold: Math.max(14, Math.round(pieceSize * 0.15)),
+    viewportWidth,
+  };
+};
 
 const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onComplete }) => {
   const [pieces, setPieces] = useState([]);
@@ -23,23 +55,26 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
   const [imageSrc, setImageSrc] = useState(propImageSrc || null);
   const [imageName, setImageName] = useState(propImageName || '');
   const [isComplete, setIsComplete] = useState(false);
-  const [countdown, setCountdown] = useState(3);
+  const [layout, setLayout] = useState(() => getPuzzleLayout());
   const [justSnapped, setJustSnapped] = useState(null);
   const [showCheckButton, setShowCheckButton] = useState(false);
   const [checkResult, setCheckResult] = useState(null); // 'success' | 'fail' | null
   const [showFullImage, setShowFullImage] = useState(false);
-  
+
   const snapSoundRef = useRef(null);
   const completeSoundRef = useRef(null);
 
-  const imageMap = {
-    'teddy_1.jpg': teddy1,
-    'teddy_2.jpg': teddy2,
-    'teddy_3.jpg': teddy3,
-    'teddy_4.svg': teddy4,
-    'teddy_5.jpg': teddy5,
-    'teddy_6.svg': teddy6,
-  };
+  const floatingHearts = useMemo(
+    () =>
+      Array.from({ length: layout.isMobile ? 8 : 15 }).map((_, i) => ({
+        key: `heart-${i}`,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${4 + Math.random() * 3}s`,
+      })),
+    [layout.isMobile]
+  );
 
   useEffect(() => {
     // Initialize image from props
@@ -58,10 +93,19 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
   }, [propImageSrc, propImageName]);
 
   useEffect(() => {
+    const handleResize = () => {
+      setLayout(getPuzzleLayout());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     if (imageSrc) {
       initializePuzzle();
     }
-  }, [imageSrc]);
+  }, [imageSrc, layout]);
 
   useEffect(() => {
     if (snappedPieces.size === ROWS * COLS && !isComplete) {
@@ -99,15 +143,15 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
     return pattern;
   };
 
-  const generateJigsawPath = (row, col, tabPattern) => {
-    const size = PIECE_SIZE;
+  const generateJigsawPath = (row, col, tabPattern, pieceSize) => {
+    const size = pieceSize;
     const tabSize = size * 0.2;
     const tabDepth = size * 0.15;
-    
+
     const tabs = tabPattern[row][col];
-    
+
     let path = `M 0 0`;
-    
+
     // Top edge
     if (tabs.top === 0) {
       path += ` L ${size} 0`;
@@ -119,7 +163,7 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
       path += ` Q ${mid + tabSize} ${-tabDepth * direction} ${mid + tabSize} 0`;
       path += ` L ${size} 0`;
     }
-    
+
     // Right edge
     if (tabs.right === 0) {
       path += ` L ${size} ${size}`;
@@ -131,7 +175,7 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
       path += ` Q ${size + tabDepth * direction} ${mid + tabSize} ${size} ${mid + tabSize}`;
       path += ` L ${size} ${size}`;
     }
-    
+
     // Bottom edge
     if (tabs.bottom === 0) {
       path += ` L 0 ${size}`;
@@ -143,7 +187,7 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
       path += ` Q ${mid - tabSize} ${size + tabDepth * direction} ${mid - tabSize} ${size}`;
       path += ` L 0 ${size}`;
     }
-    
+
     // Left edge
     if (tabs.left === 0) {
       path += ` L 0 0`;
@@ -155,50 +199,51 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
       path += ` Q ${-tabDepth * direction} ${mid - tabSize} 0 ${mid - tabSize}`;
       path += ` L 0 0`;
     }
-    
+
     path += ` Z`;
     return path;
   };
 
   const initializePuzzle = () => {
+    const { gridStartX, gridStartY, isMobile, pieceSize, playAreaMinHeight, viewportWidth } = layout;
     const tabPattern = generateTabPattern();
     const newPieces = [];
-    
+    const scatterTop = isMobile ? gridStartY + pieceSize * ROWS + 28 : 140;
+    const scatterHeight = Math.max(120, playAreaMinHeight - scatterTop - pieceSize - 20);
+    const maxDesktopX = Math.max(30, gridStartX - pieceSize - 24);
+
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const pieceId = row * COLS + col;
-        const correctX = SOLUTION_START_X + col * PIECE_SIZE;
-        const correctY = SOLUTION_START_Y + row * PIECE_SIZE;
-        
-        // Scatter pieces widely across viewport (avoiding solution area on right)
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        const maxX = Math.max(500, viewportWidth - PIECE_SIZE - 550); // Avoid right side UI
-        const maxY = Math.max(400, viewportHeight - PIECE_SIZE - 250); // Avoid top/bottom UI
-        
-        const randomX = 30 + Math.random() * maxX;
-        const randomY = 140 + Math.random() * maxY; // Start below progress bar
-        const randomRotation = 0; // No rotation for easier identification
-        
+        const correctX = gridStartX + col * pieceSize;
+        const correctY = gridStartY + row * pieceSize;
+        const randomX = isMobile
+          ? 12 + Math.random() * Math.max(12, viewportWidth - pieceSize - 24)
+          : 20 + Math.random() * maxDesktopX;
+        const randomY = scatterTop + Math.random() * scatterHeight;
+
         newPieces.push({
           id: pieceId,
           row,
           col,
           x: randomX,
           y: randomY,
-          rotation: randomRotation,
+          rotation: 0,
           correctX,
           correctY,
-          path: generateJigsawPath(row, col, tabPattern),
-          imageOffsetX: -col * PIECE_SIZE,
-          imageOffsetY: -row * PIECE_SIZE,
+          path: generateJigsawPath(row, col, tabPattern, pieceSize),
+          imageOffsetX: -col * pieceSize,
+          imageOffsetY: -row * pieceSize,
         });
       }
     }
-    
+
     setPieces(newPieces);
     setSnappedPieces(new Set());
     setIsComplete(false);
+    setShowFullImage(false);
+    setCheckResult(null);
+    setJustSnapped(null);
   };
 
   const handleDragEnd = (event, info, piece) => {
@@ -206,13 +251,13 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
 
     const newX = piece.x + info.offset.x;
     const newY = piece.y + info.offset.y;
-    
+
     // Grid-only snapping: Check if piece is near its CORRECT grid position
     const distanceToCorrect = Math.sqrt(
       Math.pow(newX - piece.correctX, 2) + Math.pow(newY - piece.correctY, 2)
     );
-    
-    if (distanceToCorrect < SNAP_THRESHOLD) {
+
+    if (distanceToCorrect < layout.snapThreshold) {
       // Snap to correct position
       setPieces(prev =>
         prev.map(p =>
@@ -221,13 +266,13 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
             : p
         )
       );
-      
+
       setSnappedPieces(prev => new Set([...prev, piece.id]));
       setJustSnapped(piece.id);
-      
+
       // Clear animation after delay (650ms gives buffer after 600ms sparkle animation)
       setTimeout(() => setJustSnapped(null), 650);
-      
+
       snapSoundRef.current?.play().catch(e => console.log('Audio play failed:', e));
     } else {
       // Update position
@@ -243,19 +288,18 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
     const totalPieces = ROWS * COLS;
     const correctPieces = snappedPieces.size;
     const accuracyPercentage = Math.round((correctPieces / totalPieces) * 100);
-    
+
     const requiredAccuracy = 60;
-    
+
     if (accuracyPercentage >= requiredAccuracy) {
       // Success! 60% or more pieces are correct
       setCheckResult('success');
       setIsComplete(true);
-      setCountdown(3);
       completeSoundRef.current?.play().catch(e => console.log('Audio play failed:', e));
     } else {
       // Not enough correct pieces
       setCheckResult('fail');
-      
+
       // Reset fail message after 3 seconds
       setTimeout(() => {
         setCheckResult(null);
@@ -268,15 +312,15 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
   return (
     <div className="teddy-jigsaw-container">
       {/* Floating hearts decoration */}
-      {Array.from({ length: 15 }).map((_, i) => (
+      {floatingHearts.map(heart => (
         <div
-          key={`heart-${i}`}
+          key={heart.key}
           className="floating-heart"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 5}s`,
-            animationDuration: `${4 + Math.random() * 3}s`,
+            left: heart.left,
+            top: heart.top,
+            animationDelay: heart.animationDelay,
+            animationDuration: heart.animationDuration,
           }}
         >
           💕
@@ -286,11 +330,11 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
       <div className="puzzle-header">
         <p className="puzzle-hint">Complete the picture</p>
         <div className="progress-bar-container">
-          <div 
-            className="progress-bar" 
+          <div
+            className="progress-bar"
             style={{ width: `${progressPercentage}%` }}
           >
-            <motion.span 
+            <motion.span
               className="progress-text"
               key={`count-${snappedPieces.size}`}
               initial={{ scale: 1.5, color: '#ffd700' }}
@@ -301,7 +345,7 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
             </motion.span>
           </div>
         </div>
-        
+
         {/* Check Puzzle Button */}
         <AnimatePresence>
           {showCheckButton && !isComplete && (
@@ -319,7 +363,7 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
             </motion.button>
           )}
         </AnimatePresence>
-        
+
         {/* Feedback Messages */}
         <AnimatePresence>
           {checkResult === 'fail' && (
@@ -338,34 +382,42 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
         </AnimatePresence>
       </div>
 
-      <div className="puzzle-play-area">
+      <div className="puzzle-play-area" style={{ minHeight: `${layout.playAreaMinHeight}px` }}>
         {/* Grid boxes with ghost images */}
-        <div className="grid-container">
+        <div
+          className="grid-container"
+          style={{
+            left: layout.gridStartX,
+            top: layout.gridStartY,
+            width: layout.gridWidth,
+            height: layout.gridHeight,
+          }}
+        >
           {pieces.map(piece => (
             <div
               key={`grid-${piece.id}`}
               className="grid-box"
               style={{
                 position: 'absolute',
-                left: piece.correctX - SOLUTION_START_X,
-                top: piece.correctY - SOLUTION_START_Y,
-                width: PIECE_SIZE,
-                height: PIECE_SIZE,
+                left: piece.correctX - layout.gridStartX,
+                top: piece.correctY - layout.gridStartY,
+                width: layout.pieceSize,
+                height: layout.pieceSize,
               }}
             >
               <svg
-                width={PIECE_SIZE}
-                height={PIECE_SIZE}
-                viewBox={`0 0 ${PIECE_SIZE} ${PIECE_SIZE}`}
+                width={layout.pieceSize}
+                height={layout.pieceSize}
+                viewBox={`0 0 ${layout.pieceSize} ${layout.pieceSize}`}
                 style={{ overflow: 'visible' }}
               >
                 <path
                   d={piece.path}
                   fill="none"
                   stroke="#ff69b4"
-                  strokeWidth={snappedPieces.has(piece.id) ? "1" : "3"}
+                  strokeWidth={snappedPieces.has(piece.id) ? '1' : '3'}
                   strokeDasharray="5,5"
-                  opacity={snappedPieces.has(piece.id) ? "0.2" : "0.6"}
+                  opacity={snappedPieces.has(piece.id) ? '0.2' : '0.6'}
                 />
               </svg>
             </div>
@@ -376,92 +428,94 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
         <div className="pieces-container">
           <AnimatePresence>
             {pieces.map(piece => (
-            <motion.div
-              key={piece.id}
-              drag={!snappedPieces.has(piece.id)}
-              dragMomentum={false}
-              dragElastic={0}
-              onDragEnd={(event, info) => handleDragEnd(event, info, piece)}
-              initial={{ opacity: 0, scale: 0.5, x: piece.x, y: piece.y }}
-              animate={{
-                opacity: 1,
-                scale: justSnapped === piece.id ? [1, 1.15, 1] : 1,
-                rotate: piece.rotation,
-                ...(snappedPieces.has(piece.id) ? { x: piece.x, y: piece.y } : {}),
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 200,
-                damping: 30,
-                opacity: { duration: 0.6, ease: 'easeOut' },
-                scale: { duration: 0.5, ease: 'easeInOut' }
-              }}
-              className={`puzzle-piece ${snappedPieces.has(piece.id) ? 'snapped' : ''} ${justSnapped === piece.id ? 'just-snapped' : ''}`}
-              style={{
-                position: 'absolute',
-                width: PIECE_SIZE,
-                height: PIECE_SIZE,
-                cursor: snappedPieces.has(piece.id) ? 'not-allowed' : 'grab',
-              }}
-              whileHover={!snappedPieces.has(piece.id) ? {} : {}}
-              whileDrag={{ cursor: 'grabbing', zIndex: 1000 }}
-            >
-              <svg
-                width={PIECE_SIZE}
-                height={PIECE_SIZE}
-                viewBox={`0 0 ${PIECE_SIZE} ${PIECE_SIZE}`}
-                style={{ overflow: 'visible' }}
+              <motion.div
+                key={piece.id}
+                drag={!snappedPieces.has(piece.id)}
+                dragMomentum={false}
+                dragElastic={0}
+                onDragEnd={(event, info) => handleDragEnd(event, info, piece)}
+                initial={{ opacity: 0, scale: 0.5, x: piece.x, y: piece.y }}
+                animate={{
+                  opacity: 1,
+                  scale: justSnapped === piece.id ? [1, 1.15, 1] : 1,
+                  rotate: piece.rotation,
+                  ...(snappedPieces.has(piece.id) ? { x: piece.x, y: piece.y } : {}),
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 200,
+                  damping: 30,
+                  opacity: { duration: 0.6, ease: 'easeOut' },
+                  scale: { duration: 0.5, ease: 'easeInOut' },
+                }}
+                className={`puzzle-piece ${snappedPieces.has(piece.id) ? 'snapped' : ''} ${justSnapped === piece.id ? 'just-snapped' : ''}`}
+                style={{
+                  position: 'absolute',
+                  width: layout.pieceSize,
+                  height: layout.pieceSize,
+                  cursor: snappedPieces.has(piece.id) ? 'not-allowed' : 'grab',
+                }}
+                whileHover={!snappedPieces.has(piece.id) ? {} : {}}
+                whileDrag={{ cursor: 'grabbing', zIndex: 1000 }}
               >
-                <defs>
-                  <clipPath id={`clip-${piece.id}`}>
-                    <path d={piece.path} />
-                  </clipPath>
-                </defs>
-                <image
-                  href={imageSrc}
-                  width={COLS * PIECE_SIZE}
-                  height={ROWS * PIECE_SIZE}
-                  x={piece.imageOffsetX}
-                  y={piece.imageOffsetY}
-                  clipPath={`url(#clip-${piece.id})`}
-                  preserveAspectRatio="xMidYMid slice"
-                />
-                <path
-                  d={piece.path}
-                  fill="none"
-                  stroke={snappedPieces.has(piece.id) ? '#ff69b4' : '#ffb6c1'}
-                  strokeWidth="2"
-                  opacity="0.5"
-                />
-              </svg>              
-              {/* Connection sparkles */}
-              {justSnapped === piece.id && (
-                <>
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="connection-sparkle"
-                      initial={{ 
-                        x: PIECE_SIZE / 2, 
-                        y: PIECE_SIZE / 2,
-                        scale: 0,
-                        opacity: 1
-                      }}
-                      animate={{ 
-                        x: PIECE_SIZE / 2 + Math.cos((i * Math.PI * 2) / 8) * 60,
-                        y: PIECE_SIZE / 2 + Math.sin((i * Math.PI * 2) / 8) * 60,
-                        scale: [0, 1, 0],
-                        opacity: [1, 1, 0]
-                      }}
-                      transition={{ duration: 0.6, ease: 'easeOut' }}
-                    >
-                      ✨
-                    </motion.div>
-                  ))}
-                </>
-              )}            </motion.div>
-          ))}
-        </AnimatePresence>
+                <svg
+                  width={layout.pieceSize}
+                  height={layout.pieceSize}
+                  viewBox={`0 0 ${layout.pieceSize} ${layout.pieceSize}`}
+                  style={{ overflow: 'visible' }}
+                >
+                  <defs>
+                    <clipPath id={`clip-${piece.id}`}>
+                      <path d={piece.path} />
+                    </clipPath>
+                  </defs>
+                  <image
+                    href={imageSrc}
+                    width={COLS * layout.pieceSize}
+                    height={ROWS * layout.pieceSize}
+                    x={piece.imageOffsetX}
+                    y={piece.imageOffsetY}
+                    clipPath={`url(#clip-${piece.id})`}
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                  <path
+                    d={piece.path}
+                    fill="none"
+                    stroke={snappedPieces.has(piece.id) ? '#ff69b4' : '#ffb6c1'}
+                    strokeWidth="2"
+                    opacity="0.5"
+                  />
+                </svg>
+
+                {/* Connection sparkles */}
+                {justSnapped === piece.id && (
+                  <>
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="connection-sparkle"
+                        initial={{
+                          x: layout.pieceSize / 2,
+                          y: layout.pieceSize / 2,
+                          scale: 0,
+                          opacity: 1,
+                        }}
+                        animate={{
+                          x: layout.pieceSize / 2 + Math.cos((i * Math.PI * 2) / 8) * Math.max(32, layout.pieceSize * 0.45),
+                          y: layout.pieceSize / 2 + Math.sin((i * Math.PI * 2) / 8) * Math.max(32, layout.pieceSize * 0.45),
+                          scale: [0, 1, 0],
+                          opacity: [1, 1, 0],
+                        }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                      >
+                        ✨
+                      </motion.div>
+                    ))}
+                  </>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Full Image Reveal on Completion */}
@@ -469,13 +523,19 @@ const TeddyJigsaw = ({ imageSrc: propImageSrc, imageName: propImageName, onCompl
           {showFullImage && (
             <motion.div
               className="full-image-reveal"
+              style={{
+                left: layout.gridStartX,
+                top: layout.gridStartY,
+                width: layout.gridWidth,
+                height: layout.gridHeight,
+              }}
               initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1.15 }}
+              animate={{ opacity: 1, scale: 1.06 }}
               transition={{ duration: 2, ease: [0.34, 1.56, 0.64, 1] }}
             >
               <div className="glow-overlay" />
-              <img 
-                src={imageSrc} 
+              <img
+                src={imageSrc}
                 alt="Completed Puzzle"
                 className="revealed-image"
               />
